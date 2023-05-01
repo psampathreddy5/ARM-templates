@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storage_account_name": {
+            "value": "psreddy01" 
+        },
+        "SKU_name": {
+            "value": "Standard_LRS" 
+        },
+        "tire": {
+            "value": "Standard" 
+        },
+        "accessTier": {
+            "value": "Cool" 
+        },
+        "stage": {
+            "value": "dev" 
+        }
+    }
+}

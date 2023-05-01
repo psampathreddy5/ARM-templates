@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServicePlanName": {
+            "value": "dotnetPlan" 
+        },        
+        "SkU_name": {
+            "value": "F1" 
+        },
+        "insights_name": {
+            "value": "dotnet_insights" 
+        },
+        "appserviceName": {
+            "value": "samapthdotnet01" 
+        }
+    }
+}

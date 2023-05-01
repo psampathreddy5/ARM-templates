@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {        
+        "Virtualnetworkname": {
+            "value": "sampath-vet-" 
+        },
+        "location": {
+            "value": "eastus" 
+        },
+        "VNetIP": {
+            "value": "192.0.0.0/16" 
+        },
+        "subnet-01": {
+            "value": "webserver" 
+        },
+        "subnet-01-IP": {
+            "value": "192.0.1.0/24" 
+        },
+        "subnet-02": {
+            "value": "dbserver" 
+        },
+        "subnet-02-IP": {
+            "value": "192.0.2.0/24" 
+        },     
+        "ddosPlanName": {
+            "value": "sampath-ddos-plan" 
+        },        
+        "nsg-name": {
+            "value": "sampathnsg" 
+        },
+        "publicIP": {
+            "value": "sampathpip" 
+        },
+        "nicname": {
+            "value": "sampath-nic" 
+        },
+        "natname": {
+            "value": "sampathnat" 
+        },
+        "proximityPlacementGroupname": {
+            "value": "sampathppg" 
+        },
+        "availabilitySetsname": {
+            "value": "sampathabs" 
+        },
+        "vmname": {
+            "value": "sampath-winvm" 
+        },
+        "adminUsername": {
+            "value": "sampath" 
+        },
+        "adminPassword": {
+            "value": "Sainath@12345678#!" 
+        },
+        "vmSize": {
+            "value": "Standard_B1s" 
+        }
+    }
+}

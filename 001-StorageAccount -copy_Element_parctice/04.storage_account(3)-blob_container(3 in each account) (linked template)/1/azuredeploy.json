@@ -1,0 +1,84 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storage_account_name": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "SKU_name": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "tire": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "container_name": {
+            "type": "string",
+            "metadata": {
+                "description": "name of the container, the folder structure as  '/default/sampath' "
+            }
+        },
+        "copy_container_count": {
+            "type": "int",
+            "metadata": {
+                "description": "number of copies to make"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "storage_account_name": "[concat(parameters('storage_account_name') , resourceGroup().location )]",
+        "container_name": "[concat(variables('storage_account_name') , '/default/' , parameters('container_name'))]",
+        "tags": {
+            "location": "eastus",
+            "environment": "dev"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('storage_account_name')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[parameters('SKU_name')]",
+                "tier": "[parameters('tire')]"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Hot",
+                "allowBlobPublicAccess": true,
+                "minimumTlsVersion": "TLS1_2",
+                "publicNetworkAccess": "Enabled"
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2022-05-01",
+            "name": "[concat(variables('container_name') , copyIndex('copycontainer' , 1 ))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_account_name'))]"
+            ],
+            "copy": {
+                "name": "copycontainer",
+                "count": "[parameters('copy_container_count')]",
+                "mode": "Serial"                
+            }            
+        }
+    ],
+    "outputs": {}
+}
+
+
+
+

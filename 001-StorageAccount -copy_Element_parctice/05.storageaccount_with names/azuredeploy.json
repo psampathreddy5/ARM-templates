@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storage_account_name": {
+            "type": "string",
+            "metadata": {
+                "description": "name of storage account with location as suffix"
+            }
+        },
+        "count": {
+            "type": "array",
+            "defaultValue": [
+                "sampath",
+                "aravind",
+                "vijay",
+                "naveen",
+                "sainath"
+            ],
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "storage_account_name": "[concat(parameters('storage_account_name') , resourceGroup().location)]",
+        "tags": {
+            "location": "eastus",
+            "env": "dev"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('storage_account_name')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Cool",
+                "allowBlobPublicAccess": true,
+                "publicNetworkAccess": "Enabled"
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2022-05-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_account_name'))]"
+            ],
+            "name": "[concat(variables('storage_account_name') , '/default/sampath-' , parameters('count')[copyIndex('copy_container')])]",
+            "copy": {
+                "name": "copy_container",
+                "mode": "Parallel",
+                "count": "[length(parameters('count'))]"
+            }
+        }
+    ],
+    "outputs": {}
+}

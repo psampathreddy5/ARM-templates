@@ -1,0 +1,87 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "name": "storage_account",
+        "discription": "creation of azure storage account with blob container in it"
+    },
+    "parameters": {
+        "storage-account-name": {
+            "type": "string",
+            "metadata": {
+                "description": "name of storage account, with unique string with sufix as location name"
+            }
+        },
+        "SKU_Name": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS",
+                "Standard_GZRS"
+            ],
+            "metadata": {
+                "description": "choose sku's from the allowed values"
+            }
+        },
+        "tier": {
+            "type": "string",
+            "allowedValues": [
+                "Premium",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "Choose tire"
+            }
+        },
+        "stage": {
+            "type": "string",
+            "allowedValues": [
+                "DEV",
+                "QA",
+                "PreProd",
+                "PROD"
+            ],
+            "metadata": {
+                "description": "Environment"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "storage-account-name": "[concat(parameters('storage-account-name'), resourceGroup().location)]",
+        "tags": {
+            "location": "[variables('location')]",
+            "environment": "[parameters('stage')]"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('storage-account-name')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[parameters('SKU_Name')]",
+                "tier": "[parameters('tier')]"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Cool",
+                "allowBlobPublicAccess": true,
+                "minimumTlsVersion": "TLS1_2"
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2022-05-01",
+            "name": "[concat(variables('storage-account-name'), '/default/sampath')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage-account-name'))]"
+            ]            
+        }
+    ],
+    "outputs": {}
+}

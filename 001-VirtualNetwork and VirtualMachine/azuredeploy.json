@@ -1,0 +1,413 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",    
+    "metadata": {
+        "Name": "virtual machine deploynment ",
+        "owner": "sampath reddy"
+    },
+    "parameters": {
+        "Virtualnetworkname": {
+            "type": "string",
+            "metadata": {
+                "description": "virtual network name, and name suffix with resourcegroup location"
+            }
+        },
+        "location": {
+            "type": "string",            
+            "metadata": {
+                "description": "location of resource group is assigned to every resources"
+            }
+        },
+        "VNetIP": {
+            "type": "string",            
+            "metadata": {
+                "description": "Virtual network ip address"
+            }
+        },
+        "subnet-01": {
+            "type": "string",
+            "metadata": {
+                "description": "Subnet allocated to subnet-01, and its name is webserver"
+            }
+        },
+        "subnet-01-IP": {
+            "type": "string",
+            "metadata": {
+                "description": "webserver ip address"
+            }
+        },
+        "subnet-02": {
+            "type": "string",
+            "metadata": {
+                "description": "Subnet allocated to subnet-02, and its name is dbserver"
+            }
+        },
+        "subnet-02-IP": {
+            "type": "string",
+            "metadata": {
+                "description": "dbserver ip address"
+            }
+        },        
+         "ddosPlanName": {
+            "type": "string",
+            "metadata": {
+            "description": "description"
+            }
+         },
+        
+        "nsg-name": {
+            "type": "string",
+            "metadata": {
+                "description": "name of network security group"
+            }
+        },
+        "publicIP": {
+            "type": "string",
+            "metadata": {
+                "description": "name of publicip address and ip  is allocated dynamically by azure"
+            }
+        },
+        "nicname": {
+            "type": "string",
+            "metadata": {
+                "description": "Name ofNetwork Interferance card"
+            }
+        },
+        "natname": {
+            "type": "string",
+            "metadata": {
+                "description": "Create network address translation (NAT) gateway"
+            }
+        },
+        "proximityPlacementGroupname": {
+            "type": "string",
+            "metadata": {
+                "description": "proximity Placement Group name"
+            }
+        },
+        "availabilitySetsname": {
+            "type": "string",
+            "metadata": {
+                "description": "availability Sets Name"
+            }
+        },
+        "vmname": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of virtual machine windows"
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "user name os vm "
+            }
+        },
+        "adminPassword": {
+            "type": "securestring", 
+            "minLength": 8,
+            "maxLength": 20,
+            "metadata": {
+                "description": "user password for vm "
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_A0",
+                "Standard_A11",
+                "Standard_B1ms",
+                "Standard_B1s"
+            ],
+            "metadata": {
+                "description": "select hardware like ram and cpus"
+            }
+        }
+    },    
+    "variables": {
+        "Virtualnetworkname": "[concat(parameters('Virtualnetworkname'),uniqueString(resourceGroup().location))]",
+        "tags": {
+            "location": "eastus",
+            "environment": "developnment"
+        }
+    },
+    "resources": [     
+        {
+            // ddosProtectionPlans
+            "type": "Microsoft.Network/ddosProtectionPlans",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('ddosPlanName')]", 
+            "location": "[parameters('location')]",                            
+            "tags": "[variables('tags')]",
+            "properties": ""
+        },       
+        {
+            // networkSecurityGroups
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('nsg-name')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowRDPInbound",
+                        "properties": {
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "description": "Allow Any RDP Inbound",
+                            "sourcePortRange": "*",
+                            "protocol": "Tcp",
+                            "priority": 100,
+                            "destinationPortRange": "*",
+                            "destinationPortRanges": [
+                                "3389"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "AllowPing",
+                        "properties": {
+                            "access": "Allow",
+                            "direction": "Outbound",
+                            "description": "allow ping through icmp port",
+                            "sourcePortRange": "*",
+                            "protocol": "Icmp",
+                            "priority": 101,
+                            "destinationPortRange": "*"                           
+                        }
+                    }
+                ]
+            },
+            "tags": "[variables('tags')]"
+        },          
+        {
+            // virtualNetworks   
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2022-07-01",
+            "name": "[variables('Virtualnetworkname')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('VNetIP')]"
+                }                                           
+            },
+            "resources": [
+                {
+                    "type": "subnets",
+                    "apiVersion": "2022-07-01",
+                    "name": "[parameters('subnet-01')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('Virtualnetworkname'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[parameters('subnet-01-IP')]"
+                    }
+                },
+                {
+                    "type": "subnets",
+                    "apiVersion": "2022-07-01",
+                    "name": "[parameters('subnet-02')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('Virtualnetworkname'))]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[parameters('subnet-02-IP')]"
+                    }
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('ddosPlanName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg-name'))]"
+            ],
+            "tags": "[variables('tags')]"                    
+        },
+        {
+            // public IP address
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('publicIP')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Global"
+            },
+            "zones": [
+                "Zone-redundant"
+            ],
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4,
+                "ddosSettings": {
+                    "protectedIP": true,
+                    "protectionCoverage": "Standard",
+                    "ddosCustomPolicy": {
+                        "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('ddosPlanName'))]"
+                    }
+                }
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            // Network Interferance card
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('nicname')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Virtualnetworkname'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Virtualnetworkname'), parameters('subnet-01'))]"                
+            ],
+            "properties": {
+                "enableIPForwarding": true,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg-name'))]"
+                },
+                "enableAcceleratedNetworking": true,
+                "ipConfigurations": [
+                    {
+                        "name": "sampathipconfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Virtualnetworkname'),parameters('subnet-01'))]"
+                            }
+                        }
+                    }
+                ]                
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            // Create network address translation (NAT) gateway
+            "type": "Microsoft.Network/natGateways",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('natname')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "idleTimeoutInMinutes": 4,
+                "publicIpAddresses": [
+                    {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIP'))]"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks',variables('Virtualnetworkname'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Virtualnetworkname'), parameters('subnet-01'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Virtualnetworkname'), parameters('subnet-02'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIP'))]"
+            ],
+            "tags": "[variables('tags')]"
+        },
+        {
+            // Proximity placement group
+            "type": "Microsoft.Compute/proximityPlacementGroups",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('proximityPlacementGroupname')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "proximityPlacementGroupType": "Standard"
+            },
+            "tags": "[variables('tags')]"
+        },
+        {
+            // Avaliablity set
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('availabilitySetsname')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupname'))]"
+            ],
+            "properties": {
+                "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupname'))]"
+                }
+            },            
+            "tags" : "[variables('tags')]"
+        },
+        {
+            // virtual machine windows 
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('vmname')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('Virtualnetworkname'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('Virtualnetworkname'), parameters('subnet-01'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIP'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg-name'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('nicname'))]"                
+            ],
+            "properties": {
+                "proximityPlacementGroup": {
+                    "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups', parameters('proximityPlacementGroupname'))]"
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilitySetsname'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]",
+                    "vmSizeProperties": {
+                        "vCPUsAvailable": 4,
+                        "vCPUsPerCore": 2
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsDesktop",
+                        "offer": "Windows-11",
+                        "sku": "20h2-pro",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('vmname'), '_osdisk')]",
+                        "osType": "Windows",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "deleteOption": "Delete",
+                        "diffDiskSettings": {
+                            "option": "Local",
+                            "placement": "ResourceDisk"
+                        }
+                    }
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmname')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "allowExtensionOperations": true,
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "timeZone": "India Standard Time"
+                    }                    
+                },
+                "networkProfile": {
+                    "networkApiVersion": "2020-11-01",
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicname'))]",
+                            "properties": {
+                                "deleteOption": "Delete",
+                                "primary": true
+                            }
+                        }
+                    ]
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": true,
+                    "ultraSSDEnabled": true
+                }
+            },
+            "plan": {
+                "name": "2022-datacenter-azure-edition-core",
+                "product": "windowsserver",
+                "publisher": "microsoftwindowsserver"
+            },
+            "tags": "[variables('tags')]"
+        }        
+    ]    
+}

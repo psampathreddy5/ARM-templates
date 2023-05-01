@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "name": "Linked_Template",
+        "description": "This file is to create 3 Azure Storage Accounts with 20 blob containers in each account"
+    },
+    "parameters": {
+        "storage1_template_link": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "storage1_parameter_link": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "storage2_template_link": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "storage2_parameter_link": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "storage3_template_link": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "storage3_parameter_link": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "linked_template_storageaccount01",            
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('storage1_template_link')]"
+                },
+                "parametersLink": {
+                    "uri": "[parameters('storage1_parameter_link')]"
+                }
+                                  
+                
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "linked_template_storageaccount02",            
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('storage2_template_link')]"
+                },
+                "parametersLink": {
+                    "uri": "[parameters('storage2_parameter_link')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "linked_template_storageaccount03",            
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('storage3_template_link')]"
+                },
+                "parametersLink": {
+                    "uri": "[parameters('storage3_parameter_link')]"
+                }
+            }
+        }
+
+    ],
+    "outputs": {}
+}

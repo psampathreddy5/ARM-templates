@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storage1_template_link": {
+            "value": "https://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@raw.githubusercontent.com/psampathreddy5/azuredeploy/main/04.storage_account(3)-blob_container(3%20in%20each%20account)/1/azuredeploy.json?token=GHSAT0AAAAAACANRGKOPXMFZYETIP56XVPUZA4DHQQ"
+        },
+        "storage1_parameter_link": {
+            "value": "https://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@raw.githubusercontent.com/psampathreddy5/azuredeploy/main/04.storage_account(3)-blob_container(3%20in%20each%20account)/1/azuredeploy.parameters.json?token=GHSAT0AAAAAACANRGKOAKOMVTEA5NKNWTYYZA4DIDA"
+        },
+        "storage2_template_link": {
+            "value": "https://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@raw.githubusercontent.com/psampathreddy5/azuredeploy/main/04.storage_account(3)-blob_container(3%20in%20each%20account)/2/azuredeploy.json?token=GHSAT0AAAAAACANRGKO5QLWTSQLUQWJB7A4ZA4DIOA"
+        },
+        "storage2_parameter_link": {
+            "value": "https://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@raw.githubusercontent.com/psampathreddy5/azuredeploy/main/04.storage_account(3)-blob_container(3%20in%20each%20account)/2/azuredeploy.parameters.json?token=GHSAT0AAAAAACANRGKOTKEGETOIF42IU4S4ZA4DIYQ"
+        },
+        "storage3_template_link": {
+            "value": "https://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@raw.githubusercontent.com/psampathreddy5/azuredeploy/main/04.storage_account(3)-blob_container(3%20in%20each%20account)/3/azuredeploy.json?token=GHSAT0AAAAAACANRGKOB7Y3MY4RDAAGLPW4ZA4DJEQ"
+        },
+        "storage3_parameter_link": {
+            "value": "https://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@raw.githubusercontent.com/psampathreddy5/azuredeploy/main/04.storage_account(3)-blob_container(3%20in%20each%20account)/3/azuredeploy.parameters.json?token=GHSAT0AAAAAACANRGKPA32NCTH3LF7JMCG2ZA4DJNA"
+        }
+    }
+}

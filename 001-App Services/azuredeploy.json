@@ -1,0 +1,109 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "0.0.0.1",
+    "metadata": {
+        "Name": "Azure_Web_App",
+        "Owner": "sampath-reddy",
+        "Discription": "creation of azure web app"
+    },
+    "parameters": {
+        "appServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "name of app service plan"
+            }
+        },
+        "SkU_name": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify and mention the sku of plan, like free or standard or basic"
+            }
+        },
+        "insights_name": {
+            "type": "string",
+            "metadata": {
+                "description": "name of Insights"
+            }
+        },
+        "appserviceName": {
+            "type": "string",
+            "metadata": {
+                "description": "name of the app service combine appservic name and suffix it wit h resource group location"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "Location": "eastus",
+            "environment" : "developnment"
+        },
+        "appServicePlanName": "[concat(parameters('appServicePlanName'), uniqueString(resourceGroup().location))]",
+        "appserviceName": "[concat(parameters('appserviceName'), uniqueString(resourceGroup().location))]"
+    },
+    "resources": [
+        {            
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2020-12-01",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[parameters('SkU_name')]",
+                "capacity": 1,
+                "tier": "Free"
+            },
+            "properties": {
+                "perSiteScaling": true,
+                "workerTierName": "[parameters('appServicePlanName')]"               
+            },
+            "kind": "app",
+            "tags": "[variables('tags')]"            
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[parameters('insights_name')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "Application_Type": "web",
+                "DisableIpMasking": true,
+                "Flow_Type": "Bluefield",
+                "IngestionMode": "ApplicationInsights",
+                "publicNetworkAccessForIngestion": "Enabled",
+                "ImmediatePurgeDataOn30Days": true,
+                "RetentionInDays": 30,
+                "Request_Source": "rest",
+                "ForceCustomerStorageForProfiler": true,
+                "publicNetworkAccessForQuery": "Enabled",
+                "DisableLocalAuth": true
+            },
+            "kind": "app",
+            "tags": "[variables('tags')]"
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-03-01",
+            "name": "[variables('appserviceName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Insights/components', parameters('insights_name'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "siteConfig": {
+                    "alwaysOn": true
+                },
+                "vnetRouteAllEnabled": true,
+                "vnetImagePullEnabled": true,
+                "vnetContentShareEnabled": true,
+                "reserved": true,
+                "redundancyMode": "GeoRedundant",
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": true,
+                "publicNetworkAccess": "Enable"               
+            },
+            "tags": "[variables('tags')]"
+        }
+    ]
+}

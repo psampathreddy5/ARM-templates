@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storage_account_name": {
+            "value": "sampath01" 
+        },
+        "SKU_name": {
+            "value": "Standard_LRS" 
+        },
+        "tire": {
+            "value": "Standard" 
+        },
+        "container_name": {
+            "value": "sampath" 
+        },
+        "copy_container_count": {
+            "value": 20 
+        }
+    }
+}

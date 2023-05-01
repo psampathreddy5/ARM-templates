@@ -1,0 +1,22 @@
+## Template deploynment
+=======================
+connect-AZAccount
+Select-AzSubscription -Subscription 53acb23c-f8fb-49ac-ae9e-59b994cc34c1
+New-AzResourceGroupDeployment -Name VmVnetdeploy -ResourceGroupName sampath_eastus -TemplateFile 'E:\Azure testing\test\testing\azuredeploy.json' -TemplateParameterFile 'E:\Azure testing\test\testing\azuredeploy.parameters.json'
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+CLI Powershell
+New-AzResourceGroupDeployment -Name VmVnetdeploy -ResourceGroupName sampath_rg -TemplateFile 'azuredeploy.json' -TemplateParameterFile 'azuredeploy.parameters.json'
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Template testing through folder 
+==================================
+
+Test-AzTemplate -TemplatePath 'E:\Azure testing\test\001-VirtualNetwork and VirtualMachine'
+-------------------------------------------------------------------------------------------
+
+
+## Template testing throurg files 
+==================================
+
+Test-AzTemplate -TemplatePath 'E:\Azure testing\test\001-VirtualNetwork and VirtualMachine\azuredeploy.json'
+-------------------------------------------------------------------------------------------------------------
